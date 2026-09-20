@@ -1,0 +1,3592 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Kalimba Player</title>
+
+
+<style>
+
+/* ========================================
+   全体
+======================================== */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+
+    margin: 0;
+    padding: 20px;
+
+    background: #f5f1e8;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+    color: #4d382a;
+
+    text-align: center;
+}
+
+
+h1 {
+
+    margin:
+        0
+        0
+        22px;
+
+    font-size: 34px;
+}
+
+
+/* ========================================
+   曲を作るエリア
+======================================== */
+
+.editor {
+
+    width: min(94vw, 700px);
+
+    margin:
+        0
+        auto
+        20px;
+
+    padding: 24px 20px;
+
+    background: white;
+
+    border-radius: 20px;
+
+    box-shadow:
+        0 6px 18px
+        rgba(0, 0, 0, 0.12);
+}
+
+
+.editor h2 {
+
+    margin:
+        0
+        0
+        20px;
+
+    font-size: 25px;
+}
+
+
+.input-row {
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    flex-wrap: wrap;
+
+    gap: 12px;
+
+    margin-bottom: 15px;
+}
+
+
+label {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+}
+
+
+input,
+select {
+
+    padding: 8px 10px;
+
+    font-size: 16px;
+
+    border:
+        1px solid
+        #bbb;
+
+    border-radius: 8px;
+
+    background: white;
+}
+
+
+#songTitle {
+
+    width: 210px;
+}
+
+
+#bpmInput {
+
+    width: 95px;
+}
+
+.chord-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 12px;
+    background: #f5f1e8;
+    border-radius: 10px;
+    cursor: pointer;
+}
+.chord-toggle input { width: auto; margin: 0; }
+#secondPitchLabel[hidden] { display: none; }
+
+
+/* ========================================
+   ボタン
+======================================== */
+
+button {
+
+    border: none;
+
+    cursor: pointer;
+
+    font-family: inherit;
+}
+
+
+.add-button {
+
+    padding:
+        9px
+        17px;
+
+    background: #4f91c7;
+
+    color: white;
+
+    border-radius: 22px;
+
+    font-size: 16px;
+}
+
+
+.add-button.editing {
+
+    background: #d99032;
+}
+
+
+.clear-button {
+
+    padding:
+        8px
+        14px;
+
+    background: #eee;
+
+    color: #555;
+
+    border-radius: 18px;
+}
+
+
+.save-button,
+.load-button,
+.delete-song-button {
+    padding: 8px 14px;
+    border-radius: 18px;
+    font-size: 15px;
+}
+
+.save-button {
+    background: #6a9f58;
+    color: white;
+}
+
+.load-button {
+    background: #4f91c7;
+    color: white;
+}
+
+.delete-song-button {
+    background: #f8dddd;
+    color: #7a3b3b;
+}
+
+.saved-song-row {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid #e5ddd0;
+}
+
+#savedSongSelect {
+    min-width: 210px;
+}
+
+
+.start-button {
+
+    padding:
+        11px
+        27px;
+
+    background: #e85d75;
+
+    color: white;
+
+    border-radius: 30px;
+
+    font-size: 18px;
+
+    font-weight: bold;
+}
+
+
+.speed-select {
+    padding: 8px 10px;
+    font-size: 16px;
+    border: 1px solid #bbb;
+    border-radius: 10px;
+    background: white;
+}
+
+.share-button,
+.export-button,
+.import-button {
+    padding: 8px 14px;
+    border-radius: 18px;
+    font-size: 15px;
+}
+
+.share-button {
+    background: #9a6cc3;
+    color: white;
+}
+
+.export-button,
+.import-button {
+    background: #eee7dc;
+    color: #4d382a;
+}
+
+.share-row {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid #e5ddd0;
+}
+
+#importSongFile {
+    display: none;
+}
+
+
+/* ========================================
+   音符一覧
+======================================== */
+
+.note-list {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    min-height: 58px;
+
+    padding: 12px;
+
+    margin-top: 8px;
+
+    background: #f5f1e8;
+
+    border:
+        1px solid
+        #e5ddd0;
+
+    border-radius: 12px;
+}
+
+
+.note-chip {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    padding:
+        7px
+        8px;
+
+    background: white;
+
+    border:
+        1px solid
+        #d0c6b8;
+
+    border-radius: 10px;
+
+    font-size: 14px;
+}
+
+
+.note-chip.is-editing {
+
+    outline:
+        2px solid
+        #d99032;
+}
+
+
+.note-chip button {
+
+    min-width: 27px;
+
+    padding:
+        4px
+        6px;
+
+    border-radius: 6px;
+
+    font-size: 13px;
+}
+
+
+.move-note {
+
+    background: #eeeeee;
+}
+
+
+.edit-note {
+
+    background: #e8f2fa;
+}
+
+
+.delete-note {
+
+    background: #f8dddd;
+}
+
+
+.note-chip button:disabled {
+
+    opacity: 0.3;
+
+    cursor: default;
+}
+
+
+/* ========================================
+   再生操作
+======================================== */
+
+.controls {
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    gap: 18px;
+
+    margin:
+        18px
+        0
+        15px;
+}
+
+
+.bpm-label {
+
+    font-weight: bold;
+}
+
+
+.sound-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 12px;
+    background: white;
+    border-radius: 18px;
+    font-weight: bold;
+}
+
+.sound-toggle input {
+    width: auto;
+    margin: 0;
+}
+
+
+/* ========================================
+   カリンバ画面
+======================================== */
+
+.game {
+
+    position: relative;
+
+    width: min(94vw, 700px);
+
+    height: 650px;
+
+    margin:
+        0
+        auto;
+
+    background: #8b5738;
+
+    border:
+        5px solid
+        #75462e;
+
+    border-radius: 30px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 10px 25px
+        rgba(0, 0, 0, 0.25);
+}
+
+
+/* ========================================
+   ノーツ表示部分
+
+   白線より下は見せない
+======================================== */
+
+.note-area {
+
+    position: absolute;
+
+    left: 4%;
+    right: 4%;
+    top: 0;
+
+    height: 400px;
+
+    overflow: hidden;
+
+    z-index: 30;
+}
+
+
+/* ========================================
+   白い演奏ライン
+======================================== */
+
+.play-line {
+
+    position: absolute;
+
+    left: 4%;
+    right: 4%;
+
+    top: 400px;
+
+    height: 5px;
+
+    background: white;
+
+    box-shadow:
+        0 0 10px
+        rgba(255, 255, 255, 0.9);
+
+    z-index: 50;
+}
+
+
+/* ========================================
+   落ちてくるノーツ
+======================================== */
+
+.note {
+
+    position: absolute;
+
+    width: 5%;
+
+    background: #e85d75;
+
+    border-radius:
+        12px
+        12px
+        0
+        0;
+
+    color: white;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: flex-end;
+
+    padding-bottom: 6px;
+
+    box-shadow:
+        0 3px 8px
+        rgba(0, 0, 0, 0.25);
+
+    z-index: 40;
+
+    will-change: transform;
+}
+
+
+/* ========================================
+   カリンバ鍵盤
+======================================== */
+
+.keyboard {
+
+    position: absolute;
+
+    left: 4%;
+    right: 4%;
+
+    bottom: 20px;
+
+    height: 150px;
+}
+
+
+.key {
+
+    position: absolute;
+
+    top: 0;
+
+    width: 5%;
+
+    height: 150px;
+
+    background:
+        linear-gradient(
+            to right,
+            #c8c8c8,
+            #ffffff,
+            #b5b5b5
+        );
+
+    border:
+        1px solid
+        #999;
+
+    border-radius:
+        10px
+        10px
+        5px
+        5px;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: flex-end;
+
+    padding-bottom: 12px;
+
+    color: #555;
+
+    font-size: 13px;
+
+    font-weight: bold;
+}
+
+
+/*
+17本を枠内に収めます
+*/
+
+.pos1  { left: 0%; }
+.pos2  { left: 5.9375%; }
+.pos3  { left: 11.875%; }
+.pos4  { left: 17.8125%; }
+.pos5  { left: 23.75%; }
+.pos6  { left: 29.6875%; }
+.pos7  { left: 35.625%; }
+.pos8  { left: 41.5625%; }
+.pos9  { left: 47.5%; }
+.pos10 { left: 53.4375%; }
+.pos11 { left: 59.375%; }
+.pos12 { left: 65.3125%; }
+.pos13 { left: 71.25%; }
+.pos14 { left: 77.1875%; }
+.pos15 { left: 83.125%; }
+.pos16 { left: 89.0625%; }
+.pos17 { left: 95%; }
+
+
+/*
+演奏する側から見たカリンバらしく、
+上端を揃えたまま中央に向かって少しずつ長くします。
+*/
+
+.pos1  { height: 110px; }
+.pos2  { height: 115px; }
+.pos3  { height: 120px; }
+.pos4  { height: 125px; }
+.pos5  { height: 130px; }
+.pos6  { height: 135px; }
+.pos7  { height: 140px; }
+.pos8  { height: 145px; }
+.pos9  { height: 150px; }
+.pos10 { height: 145px; }
+.pos11 { height: 140px; }
+.pos12 { height: 135px; }
+.pos13 { height: 130px; }
+.pos14 { height: 125px; }
+.pos15 { height: 120px; }
+.pos16 { height: 115px; }
+.pos17 { height: 110px; }
+
+
+/* ========================================
+   メッセージ
+======================================== */
+
+.status {
+
+    margin: 15px;
+
+    min-height: 25px;
+
+    font-size: 18px;
+
+    font-weight: bold;
+}
+
+
+/* ========================================
+   スマホ
+======================================== */
+
+@media (max-width: 600px) {
+
+    body {
+        padding: 8px;
+    }
+
+    h1 {
+        margin-bottom: 14px;
+        font-size: 25px;
+    }
+
+    .editor {
+        width: 100%;
+        padding: 16px 10px;
+        border-radius: 16px;
+    }
+
+    .editor h2 {
+        font-size: 21px;
+    }
+
+    .input-row,
+    .controls {
+        gap: 8px;
+    }
+
+    label {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    #songTitle {
+        width: min(210px, 70vw);
+    }
+
+    input,
+    select,
+    button {
+        min-height: 42px;
+        font-size: 16px;
+    }
+
+    .start-button {
+        padding: 10px 20px;
+    }
+
+    .game {
+        width: 100%;
+        height: 570px;
+        border-radius: 14px;
+    }
+
+    .note-area,
+    .play-line {
+        left: 2%;
+        right: 2%;
+    }
+
+    .keyboard {
+        left: 2%;
+        right: 2%;
+    }
+
+    .key {
+        font-size: 9px;
+    }
+
+    .note {
+        font-size: 10px;
+    }
+
+    .status {
+        margin: 10px 4px;
+        font-size: 15px;
+    }
+
+    .editor h2 {
+        margin-bottom: 0;
+    }
+
+    .editor-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 21px;
+    }
+
+    .editor-toggle-icon {
+        display: inline;
+    }
+
+    .editor.mobile-collapsed .editor-content {
+        display: none;
+    }
+
+    .editor:not(.mobile-collapsed) .editor-content {
+        margin-top: 16px;
+    }
+
+}
+
+
+.editor-toggle {
+    width: 100%;
+    min-height: 44px;
+    padding: 0;
+    background: transparent;
+    color: #4d382a;
+    border-radius: 0;
+    font-size: 25px;
+    font-weight: bold;
+    text-align: left;
+}
+
+.editor-toggle-icon {
+    display: none;
+    margin-left: 8px;
+    font-size: 15px;
+}
+
+.editor-content {
+    display: block;
+}
+
+
+/* 演奏しやすさ優先：左手・中央・右手の3色 */
+.note.hand-left {
+    background: #b9d7df; /* 淡いブルー */
+}
+
+.note.hand-center {
+    background: #eee1b9; /* 中央C4：淡いクリーム */
+}
+
+.note.hand-right {
+    background: #e3c3ca; /* 淡いピンク */
+}
+
+
+/* 鍵盤：数字表記＋音名（C4, D4...） */
+.key {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 3px;
+    padding-bottom: 8px;
+    box-sizing: border-box;
+}
+
+.key-number {
+    line-height: 1;
+}
+
+.key-letter {
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    opacity: 0.82;
+    letter-spacing: 0;
+}
+
+@media (max-width: 600px) {
+    .key-letter {
+        font-size: 9px;
+    }
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<h1>🎵 Kalimba Player</h1>
+
+
+<!-- ========================================
+     曲作成エリア
+======================================== -->
+
+<div class="editor" id="songEditor">
+
+    <h2>
+        <button
+            type="button"
+            class="editor-toggle"
+            id="editorToggle"
+            aria-expanded="true"
+            aria-controls="editorContent"
+        >
+            <span>🎼 曲をつくる</span>
+            <span class="editor-toggle-icon" id="editorToggleIcon" aria-hidden="true">▲</span>
+        </button>
+    </h2>
+
+    <div class="editor-content" id="editorContent">
+
+
+    <div class="input-row">
+
+        <label>
+
+            曲名
+
+            <input
+                id="songTitle"
+                type="text"
+                value="練習曲"
+            >
+
+        </label>
+
+
+        <label>
+
+            BPM
+
+            <input
+                id="bpmInput"
+                type="number"
+                value="120"
+                min="30"
+                max="300"
+            >
+
+        </label>
+
+        <button
+            class="save-button"
+            id="saveSongButton"
+        >
+            💾 曲を保存
+        </button>
+
+    </div>
+
+
+    <div class="input-row">
+
+        <label>
+
+            音名
+
+            <select id="pitchInput">
+
+                <option>C4</option>
+                <option>D4</option>
+                <option>E4</option>
+                <option>F4</option>
+                <option>G4</option>
+                <option>A4</option>
+                <option>B4</option>
+
+                <option>C5</option>
+                <option>D5</option>
+                <option>E5</option>
+                <option>F5</option>
+                <option>G5</option>
+                <option>A5</option>
+                <option>B5</option>
+
+                <option selected>C6</option>
+                <option>D6</option>
+                <option>E6</option>
+
+                <option value="休">
+                    休符
+                </option>
+
+            </select>
+
+        </label>
+
+
+        <label class="chord-toggle">
+            <input id="chordToggle" type="checkbox">
+            同時押し
+        </label>
+
+        <label id="secondPitchLabel" hidden>
+            同時音
+            <select id="secondPitchInput">
+                <option>C4</option><option>D4</option><option>E4</option>
+                <option>F4</option><option>G4</option><option>A4</option><option>B4</option>
+                <option>C5</option><option>D5</option><option selected>E5</option>
+                <option>F5</option><option>G5</option><option>A5</option><option>B5</option>
+                <option>C6</option><option>D6</option><option>E6</option>
+            </select>
+        </label>
+
+
+        <label>
+
+            長さ
+
+            <select id="beatsInput">
+
+                <option value="0.25">
+                    1/4拍
+                </option>
+
+                <option value="0.5">
+                    1/2拍
+                </option>
+
+                <option
+                    value="1"
+                    selected
+                >
+                    1拍
+                </option>
+
+                <option value="1.5">
+                    1.5拍
+                </option>
+
+                <option value="2">
+                    2拍
+                </option>
+
+                <option value="3">
+                    3拍
+                </option>
+
+                <option value="4">
+                    4拍
+                </option>
+
+            </select>
+
+        </label>
+
+
+        <button
+            class="add-button"
+            id="addButton"
+        >
+            ＋ 音符を追加
+        </button>
+
+
+        <button
+            class="clear-button"
+            id="clearButton"
+        >
+            全部消す
+        </button>
+
+    </div>
+
+
+    <div
+        class="note-list"
+        id="noteList"
+    ></div>
+
+    <div class="input-row saved-song-row">
+
+        <label>
+            保存した曲
+            <select id="savedSongSelect">
+                <option value="">曲を選んでください</option>
+            </select>
+        </label>
+
+        <button
+            class="load-button"
+            id="loadSongButton"
+        >
+            読み込む
+        </button>
+
+        <button
+            class="delete-song-button"
+            id="deleteSavedSongButton"
+        >
+            保存曲を削除
+        </button>
+
+    </div>
+
+    <div class="input-row share-row">
+
+        <button
+            class="share-button"
+            id="shareSongButton"
+        >
+            🔗 曲を共有
+        </button>
+
+        <button
+            class="export-button"
+            id="exportSongButton"
+        >
+            ⬇ 曲ファイル
+        </button>
+
+        <button
+            class="import-button"
+            id="importSongButton"
+        >
+            ⬆ 曲ファイルを開く
+        </button>
+
+        <input
+            id="importSongFile"
+            type="file"
+            accept=".json,application/json"
+        >
+
+    </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================
+     再生
+======================================== -->
+
+<div class="controls">
+
+    <button
+        class="start-button"
+        id="startButton"
+    >
+        ▶ スタート
+    </button>
+
+
+    <span
+        class="bpm-label"
+        id="bpmDisplay"
+    >
+        BPM 120
+    </span>
+
+    <label>
+        練習速度
+        <select
+            id="speedSelect"
+            class="speed-select"
+        >
+            <option value="0.5">0.5倍</option>
+            <option value="0.75">0.75倍</option>
+            <option value="1" selected>1倍</option>
+            <option value="1.25">1.25倍</option>
+        </select>
+    </label>
+
+    <label class="sound-toggle">
+        <input
+            id="soundToggle"
+            type="checkbox"
+            checked
+        >
+        🔊 音あり
+    </label>
+
+</div>
+
+
+<!-- ========================================
+     演奏画面
+======================================== -->
+
+<div class="game">
+
+
+    <div
+        class="note-area"
+        id="noteArea"
+    ></div>
+
+
+    <div class="play-line"></div>
+
+
+    <div class="keyboard">
+
+        <div class="key pos1">
+        <span class="key-letter">D</span>
+        <span class="key-number">2°°</span>
+    </div>
+        <div class="key pos2">
+        <span class="key-letter">B</span>
+        <span class="key-number">7°</span>
+    </div>
+        <div class="key pos3">
+        <span class="key-letter">G</span>
+        <span class="key-number">5°</span>
+    </div>
+        <div class="key pos4">
+        <span class="key-letter">E</span>
+        <span class="key-number">3°</span>
+    </div>
+        <div class="key pos5">
+        <span class="key-letter">C</span>
+        <span class="key-number">1°</span>
+    </div>
+
+        <div class="key pos6">
+        <span class="key-letter">A</span>
+        <span class="key-number">6</span>
+    </div>
+        <div class="key pos7">
+        <span class="key-letter">F</span>
+        <span class="key-number">4</span>
+    </div>
+        <div class="key pos8">
+        <span class="key-letter">D</span>
+        <span class="key-number">2</span>
+    </div>
+
+        <div class="key pos9">
+        <span class="key-letter">C</span>
+        <span class="key-number">1</span>
+    </div>
+
+        <div class="key pos10">
+        <span class="key-letter">E</span>
+        <span class="key-number">3</span>
+    </div>
+        <div class="key pos11">
+        <span class="key-letter">G</span>
+        <span class="key-number">5</span>
+    </div>
+        <div class="key pos12">
+        <span class="key-letter">B</span>
+        <span class="key-number">7</span>
+    </div>
+
+        <div class="key pos13">
+        <span class="key-letter">D</span>
+        <span class="key-number">2°</span>
+    </div>
+        <div class="key pos14">
+        <span class="key-letter">F</span>
+        <span class="key-number">4°</span>
+    </div>
+        <div class="key pos15">
+        <span class="key-letter">A</span>
+        <span class="key-number">6°</span>
+    </div>
+
+        <div class="key pos16">
+        <span class="key-letter">C</span>
+        <span class="key-number">1°°</span>
+    </div>
+        <div class="key pos17">
+        <span class="key-letter">E</span>
+        <span class="key-number">3°°</span>
+    </div>
+
+    </div>
+
+</div>
+
+
+<div
+    class="status"
+    id="status"
+>
+    準備OK
+</div>
+
+
+<script>
+
+/* ========================================
+   17キーカリンバ対応表
+======================================== */
+
+const kalimbaKeys = {
+
+    "C4": {
+        number: "1",
+        key: 9
+    },
+
+    "D4": {
+        number: "2",
+        key: 8
+    },
+
+    "E4": {
+        number: "3",
+        key: 10
+    },
+
+    "F4": {
+        number: "4",
+        key: 7
+    },
+
+    "G4": {
+        number: "5",
+        key: 11
+    },
+
+    "A4": {
+        number: "6",
+        key: 6
+    },
+
+    "B4": {
+        number: "7",
+        key: 12
+    },
+
+
+    "C5": {
+        number: "1°",
+        key: 5
+    },
+
+    "D5": {
+        number: "2°",
+        key: 13
+    },
+
+    "E5": {
+        number: "3°",
+        key: 4
+    },
+
+    "F5": {
+        number: "4°",
+        key: 14
+    },
+
+    "G5": {
+        number: "5°",
+        key: 3
+    },
+
+    "A5": {
+        number: "6°",
+        key: 15
+    },
+
+    "B5": {
+        number: "7°",
+        key: 2
+    },
+
+
+    "C6": {
+        number: "1°°",
+        key: 16
+    },
+
+    "D6": {
+        number: "2°°",
+        key: 1
+    },
+
+    "E6": {
+        number: "3°°",
+        key: 17
+    }
+
+};
+
+
+/* ========================================
+   練習曲
+
+   最後は修正版のC5
+======================================== */
+
+let melody = [
+
+    ["C6", 1],
+    ["C6", 1],
+    ["C6", 0.5],
+
+    ["B5", 0.5],
+    ["A5", 0.5],
+
+    ["G5", 1],
+
+    ["D5", 0.5],
+    ["D5", 0.5],
+
+    ["G5", 0.5],
+
+    ["E5", 1.5],
+
+    ["C5", 0.5]
+
+];
+
+
+/*
+編集している音符の番号
+*/
+
+let editingIndex = -1;
+
+
+/*
+現在動いているアニメーション
+*/
+
+let animationId = null;
+
+
+/*
+音を鳴らすためのAudioContext
+*/
+
+let audioContext = null;
+
+
+/* ========================================
+   HTML
+======================================== */
+
+const pitchInput =
+    document.getElementById(
+        "pitchInput"
+    );
+
+const chordToggle = document.getElementById("chordToggle");
+const secondPitchLabel = document.getElementById("secondPitchLabel");
+const secondPitchInput = document.getElementById("secondPitchInput");
+
+const beatsInput =
+    document.getElementById(
+        "beatsInput"
+    );
+
+const bpmInput =
+    document.getElementById(
+        "bpmInput"
+    );
+
+const bpmDisplay =
+    document.getElementById(
+        "bpmDisplay"
+    );
+
+
+const soundToggle =
+    document.getElementById(
+        "soundToggle"
+    );
+
+const addButton =
+    document.getElementById(
+        "addButton"
+    );
+
+const clearButton =
+    document.getElementById(
+        "clearButton"
+    );
+
+const startButton =
+    document.getElementById(
+        "startButton"
+    );
+
+
+const speedSelect =
+    document.getElementById(
+        "speedSelect"
+    );
+
+const shareSongButton =
+    document.getElementById(
+        "shareSongButton"
+    );
+
+const exportSongButton =
+    document.getElementById(
+        "exportSongButton"
+    );
+
+const importSongButton =
+    document.getElementById(
+        "importSongButton"
+    );
+
+const importSongFile =
+    document.getElementById(
+        "importSongFile"
+    );
+
+const noteList =
+    document.getElementById(
+        "noteList"
+    );
+
+const noteArea =
+    document.getElementById(
+        "noteArea"
+    );
+
+const status =
+    document.getElementById(
+        "status"
+    );
+
+
+const songTitle =
+    document.getElementById(
+        "songTitle"
+    );
+
+const saveSongButton =
+    document.getElementById(
+        "saveSongButton"
+    );
+
+const savedSongSelect =
+    document.getElementById(
+        "savedSongSelect"
+    );
+
+const loadSongButton =
+    document.getElementById(
+        "loadSongButton"
+    );
+
+const deleteSavedSongButton =
+    document.getElementById(
+        "deleteSavedSongButton"
+    );
+
+
+/* ========================================
+   同時押しUI
+======================================== */
+
+function updateChordUI() {
+    const isRest = pitchInput.value === "休";
+    if (isRest) {
+        chordToggle.checked = false;
+        chordToggle.disabled = true;
+    } else {
+        chordToggle.disabled = false;
+    }
+    secondPitchLabel.hidden = !chordToggle.checked || isRest;
+}
+
+chordToggle.addEventListener("change", updateChordUI);
+pitchInput.addEventListener("change", updateChordUI);
+
+
+/* ========================================
+   音符追加 / 更新
+======================================== */
+
+addButton.addEventListener("click", function() {
+    const primaryPitch = pitchInput.value;
+    const beats = Number(beatsInput.value);
+    let pitch = primaryPitch;
+
+    if (primaryPitch !== "休" && chordToggle.checked) {
+        const secondPitch = secondPitchInput.value;
+        if (secondPitch === primaryPitch) {
+            status.textContent = "同時押しは別の2音を選んでください";
+            return;
+        }
+        pitch = [primaryPitch, secondPitch];
+    }
+
+    if (editingIndex !== -1) {
+        melody[editingIndex] = [pitch, beats];
+        status.textContent = `${editingIndex + 1}番目を更新しました`;
+        finishEditing();
+        renderNoteList();
+        return;
+    }
+
+    melody.push([pitch, beats]);
+    renderNoteList();
+    status.textContent = Array.isArray(pitch)
+        ? "同時押しを追加しました"
+        : pitch === "休" ? "休符を追加しました" : "音符を追加しました";
+});
+
+/* ========================================
+   編集終了
+======================================== */
+
+function finishEditing() {
+    editingIndex = -1;
+    addButton.textContent = "＋ 音符を追加";
+    addButton.classList.remove("editing");
+    chordToggle.checked = false;
+    updateChordUI();
+}
+
+
+/* ========================================
+   一覧表示
+======================================== */
+
+function renderNoteList() {
+
+    noteList.innerHTML = "";
+
+
+    if (melody.length === 0) {
+
+        noteList.textContent =
+            "まだ音符がありません";
+
+        return;
+    }
+
+
+    melody.forEach(
+        (note, index) => {
+
+
+            const chip =
+                document.createElement(
+                    "div"
+                );
+
+
+            chip.className =
+                "note-chip";
+
+
+            if (
+                index ===
+                editingIndex
+            ) {
+
+                chip.classList.add(
+                    "is-editing"
+                );
+
+            }
+
+
+            const pitch =
+                note[0];
+
+            const beats =
+                note[1];
+
+
+            /*
+            表示文字
+            */
+
+            const text =
+                document.createElement(
+                    "span"
+                );
+
+
+            text.textContent =
+                `${index + 1}. ${formatPitch(pitch)} / ${formatBeats(beats)}`;
+
+
+            /*
+            ←
+            */
+
+            const leftButton =
+                document.createElement(
+                    "button"
+                );
+
+
+            leftButton.textContent =
+                "←";
+
+
+            leftButton.className =
+                "move-note";
+
+
+            leftButton.title =
+                "1つ前へ";
+
+
+            leftButton.disabled =
+                index === 0;
+
+
+            leftButton.addEventListener(
+                "click",
+                function() {
+
+                    moveNote(
+                        index,
+                        index - 1
+                    );
+
+                }
+            );
+
+
+            /*
+            →
+            */
+
+            const rightButton =
+                document.createElement(
+                    "button"
+                );
+
+
+            rightButton.textContent =
+                "→";
+
+
+            rightButton.className =
+                "move-note";
+
+
+            rightButton.title =
+                "1つ後ろへ";
+
+
+            rightButton.disabled =
+                index ===
+                melody.length - 1;
+
+
+            rightButton.addEventListener(
+                "click",
+                function() {
+
+                    moveNote(
+                        index,
+                        index + 1
+                    );
+
+                }
+            );
+
+
+            /*
+            編集
+            */
+
+            const editButton =
+                document.createElement(
+                    "button"
+                );
+
+
+            editButton.textContent =
+                "✏️";
+
+
+            editButton.className =
+                "edit-note";
+
+
+            editButton.title =
+                "編集";
+
+
+            editButton.addEventListener(
+                "click",
+                function() {
+
+                    editNote(index);
+
+                }
+            );
+
+
+            /*
+            削除
+            */
+
+            const deleteButton =
+                document.createElement(
+                    "button"
+                );
+
+
+            deleteButton.textContent =
+                "×";
+
+
+            deleteButton.className =
+                "delete-note";
+
+
+            deleteButton.title =
+                "削除";
+
+
+            deleteButton.addEventListener(
+                "click",
+                function() {
+
+                    deleteNote(index);
+
+                }
+            );
+
+
+            chip.appendChild(text);
+
+            chip.appendChild(
+                leftButton
+            );
+
+            chip.appendChild(
+                rightButton
+            );
+
+            chip.appendChild(
+                editButton
+            );
+
+            chip.appendChild(
+                deleteButton
+            );
+
+
+            noteList.appendChild(
+                chip
+            );
+
+        }
+    );
+
+}
+
+
+/* ========================================
+   表示用
+======================================== */
+
+function formatPitch(pitch) {
+
+    if (Array.isArray(pitch)) {
+
+        return pitch.join("＋");
+
+    }
+
+    return pitch;
+
+}
+
+
+function formatBeats(beats) {
+
+    if (beats === 0.25) {
+        return "1/4拍";
+    }
+
+    if (beats === 0.5) {
+        return "1/2拍";
+    }
+
+    if (beats === 1.5) {
+        return "1.5拍";
+    }
+
+    return beats + "拍";
+
+}
+
+
+/* ========================================
+   編集
+======================================== */
+
+function editNote(index) {
+    const note = melody[index];
+    const pitch = note[0];
+
+    editingIndex = index;
+
+    if (Array.isArray(pitch)) {
+        pitchInput.value = pitch[0];
+        secondPitchInput.value = pitch[1];
+        chordToggle.checked = true;
+    } else {
+        pitchInput.value = pitch;
+        chordToggle.checked = false;
+    }
+
+    beatsInput.value = String(note[1]);
+    updateChordUI();
+
+    addButton.textContent = "✓ この音符を更新";
+    addButton.classList.add("editing");
+    status.textContent = `${index + 1}番目を編集中`;
+    renderNoteList();
+}
+
+
+/* ========================================
+   削除
+======================================== */
+
+function deleteNote(index) {
+
+    melody.splice(
+        index,
+        1
+    );
+
+
+    /*
+    編集中だった場合の
+    番号調整
+    */
+
+    if (
+        editingIndex === index
+    ) {
+
+        finishEditing();
+
+    }
+
+    else if (
+        editingIndex > index
+    ) {
+
+        editingIndex--;
+
+    }
+
+
+    renderNoteList();
+
+
+    status.textContent =
+        "音符を削除しました";
+
+}
+
+
+/* ========================================
+   並べ替え
+======================================== */
+
+function moveNote(
+    fromIndex,
+    toIndex
+) {
+
+    if (
+        toIndex < 0 ||
+        toIndex >= melody.length
+    ) {
+
+        return;
+
+    }
+
+
+    const temp =
+        melody[fromIndex];
+
+
+    melody[fromIndex] =
+        melody[toIndex];
+
+
+    melody[toIndex] =
+        temp;
+
+
+    /*
+    編集対象も一緒に移動
+    */
+
+    if (
+        editingIndex === fromIndex
+    ) {
+
+        editingIndex =
+            toIndex;
+
+    }
+
+    else if (
+        editingIndex === toIndex
+    ) {
+
+        editingIndex =
+            fromIndex;
+
+    }
+
+
+    renderNoteList();
+
+
+    status.textContent =
+        "順番を変更しました";
+
+}
+
+
+/* ========================================
+   全部消す
+======================================== */
+
+clearButton.addEventListener(
+    "click",
+    function() {
+
+        const result =
+            confirm(
+                "入力した音符をすべて消しますか？"
+            );
+
+
+        if (!result) {
+
+            return;
+
+        }
+
+
+        melody = [];
+
+
+        finishEditing();
+
+
+        noteArea.innerHTML =
+            "";
+
+
+        renderNoteList();
+
+
+        status.textContent =
+            "すべて削除しました";
+
+    }
+);
+
+
+/* ========================================
+   melodyを再生データへ変換
+======================================== */
+
+function makeSong() {
+
+    let currentBeat =
+        0;
+
+
+    const song =
+        [];
+
+
+    melody.forEach(
+        note => {
+
+
+            const pitches =
+                note[0];
+
+
+            const beats =
+                note[1];
+
+
+            /*
+            休符
+
+            ノーツは作らず
+            時間だけ進める
+            */
+
+            if (
+                pitches === "休"
+            ) {
+
+                currentBeat +=
+                    beats;
+
+                return;
+
+            }
+
+
+            /*
+            単音なら配列化
+
+            C5
+            ↓
+            [C5]
+
+            和音ならそのまま
+            */
+
+            const pitchList =
+                Array.isArray(pitches)
+                ? pitches
+                : [pitches];
+
+
+            pitchList.forEach(
+                pitch => {
+
+
+                    const keyInfo =
+                        kalimbaKeys[pitch];
+
+
+                    if (!keyInfo) {
+
+                        return;
+
+                    }
+
+
+                    song.push({
+
+                        pitch:
+                            pitch,
+
+                        number:
+                            keyInfo.number,
+
+                        key:
+                            keyInfo.key,
+
+                        start:
+                            currentBeat,
+
+                        beats:
+                            beats
+
+                    });
+
+                }
+            );
+
+
+            /*
+            和音でも
+            時間を進めるのは1回
+            */
+
+            currentBeat +=
+                beats;
+
+        }
+    );
+
+
+    return {
+
+        notes:
+            song,
+
+        totalBeats:
+            currentBeat
+
+    };
+
+}
+
+
+/* ========================================
+   音を鳴らす
+======================================== */
+
+const noteFrequencies = {
+    "C4": 261.63,
+    "D4": 293.66,
+    "E4": 329.63,
+    "F4": 349.23,
+    "G4": 392.00,
+    "A4": 440.00,
+    "B4": 493.88,
+    "C5": 523.25,
+    "D5": 587.33,
+    "E5": 659.25,
+    "F5": 698.46,
+    "G5": 783.99,
+    "A5": 880.00,
+    "B5": 987.77,
+    "C6": 1046.50,
+    "D6": 1174.66,
+    "E6": 1318.51
+};
+
+
+
+let kalimbaReverb = null;
+
+
+function getKalimbaReverb() {
+
+    if (!audioContext) {
+        return null;
+    }
+
+    if (kalimbaReverb) {
+        return kalimbaReverb;
+    }
+
+    const convolver =
+        audioContext.createConvolver();
+
+    const reverbGain =
+        audioContext.createGain();
+
+    /*
+    短めでやさしい残響。
+    元の音色を残しながら、少しだけ空間が広がる設定。
+    */
+    const duration = 3.0;
+    const decay = 2.7;
+    const length =
+        Math.floor(
+            audioContext.sampleRate *
+            duration
+        );
+
+    const impulse =
+        audioContext.createBuffer(
+            2,
+            length,
+            audioContext.sampleRate
+        );
+
+    for (
+        let channel = 0;
+        channel < 2;
+        channel++
+    ) {
+
+        const data =
+            impulse.getChannelData(
+                channel
+            );
+
+        for (
+            let i = 0;
+            i < length;
+            i++
+        ) {
+
+            data[i] =
+                (Math.random() * 2 - 1) *
+                Math.pow(
+                    1 - i / length,
+                    decay
+                );
+
+        }
+
+    }
+
+    convolver.buffer =
+        impulse;
+
+    reverbGain.gain.value =
+        0.46;
+
+    convolver.connect(
+        reverbGain
+    );
+
+    reverbGain.connect(
+        audioContext.destination
+    );
+
+    kalimbaReverb = {
+        input: convolver
+    };
+
+    return kalimbaReverb;
+
+}
+
+
+function playKalimbaTone(pitch) {
+
+    if (
+        !audioContext ||
+        audioContext.state !== "running"
+    ) {
+        return;
+    }
+
+    const frequency =
+        noteFrequencies[pitch];
+
+    if (!frequency) {
+        return;
+    }
+
+    const now =
+        audioContext.currentTime;
+
+
+    /*
+    マスター音量
+    */
+
+    const master =
+        audioContext.createGain();
+
+    master.gain.setValueAtTime(
+        0.85,
+        now
+    );
+
+    /*
+    元の音（dry）はそのまま残し、
+    少量だけリバーブ（wet）にも送ります。
+    */
+
+    master.connect(
+        audioContext.destination
+    );
+
+    const reverb =
+        getKalimbaReverb();
+
+    if (reverb) {
+
+        master.connect(
+            reverb.input
+        );
+
+    }
+
+
+    /*
+    1. 基本音
+    カリンバの丸い芯
+    */
+
+    const fundamental =
+        audioContext.createOscillator();
+
+    const fundamentalGain =
+        audioContext.createGain();
+
+    fundamental.type =
+        "sine";
+
+    fundamental.frequency.setValueAtTime(
+        frequency,
+        now
+    );
+
+    fundamentalGain.gain.setValueAtTime(
+        0.0001,
+        now
+    );
+
+    fundamentalGain.gain.exponentialRampToValueAtTime(
+        0.34,
+        now + 0.006
+    );
+
+    fundamentalGain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        now + 1.45
+    );
+
+    fundamental.connect(
+        fundamentalGain
+    );
+
+    fundamentalGain.connect(
+        master
+    );
+
+    fundamental.start(now);
+    fundamental.stop(now + 1.5);
+
+
+    /*
+    2. 金属らしい倍音
+    */
+
+    const overtone =
+        audioContext.createOscillator();
+
+    const overtoneGain =
+        audioContext.createGain();
+
+    overtone.type =
+        "sine";
+
+    overtone.frequency.setValueAtTime(
+        frequency * 2.01,
+        now
+    );
+
+    overtoneGain.gain.setValueAtTime(
+        0.0001,
+        now
+    );
+
+    overtoneGain.gain.exponentialRampToValueAtTime(
+        0.11,
+        now + 0.004
+    );
+
+    overtoneGain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        now + 0.62
+    );
+
+    overtone.connect(
+        overtoneGain
+    );
+
+    overtoneGain.connect(
+        master
+    );
+
+    overtone.start(now);
+    overtone.stop(now + 0.68);
+
+
+    /*
+    3. 高い倍音を少量
+    「コロン」という透明感
+    */
+
+    const shimmer =
+        audioContext.createOscillator();
+
+    const shimmerGain =
+        audioContext.createGain();
+
+    shimmer.type =
+        "sine";
+
+    shimmer.frequency.setValueAtTime(
+        frequency * 3.02,
+        now
+    );
+
+    shimmerGain.gain.setValueAtTime(
+        0.0001,
+        now
+    );
+
+    shimmerGain.gain.exponentialRampToValueAtTime(
+        0.035,
+        now + 0.003
+    );
+
+    shimmerGain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        now + 0.24
+    );
+
+    shimmer.connect(
+        shimmerGain
+    );
+
+    shimmerGain.connect(
+        master
+    );
+
+    shimmer.start(now);
+    shimmer.stop(now + 0.28);
+
+
+    /*
+    4. 弾いた瞬間の小さなアタック音
+    */
+
+    const click =
+        audioContext.createOscillator();
+
+    const clickGain =
+        audioContext.createGain();
+
+    click.type =
+        "triangle";
+
+    click.frequency.setValueAtTime(
+        frequency * 4,
+        now
+    );
+
+    click.frequency.exponentialRampToValueAtTime(
+        frequency * 2.5,
+        now + 0.025
+    );
+
+    clickGain.gain.setValueAtTime(
+        0.055,
+        now
+    );
+
+    clickGain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        now + 0.045
+    );
+
+    click.connect(
+        clickGain
+    );
+
+    clickGain.connect(
+        master
+    );
+
+    click.start(now);
+    click.stop(now + 0.05);
+
+}
+
+/* ========================================
+   スタート
+======================================== */
+
+startButton.addEventListener(
+    "click",
+    startSong
+);
+
+
+function startSong() {
+
+    /*
+    前回のアニメーション停止
+    */
+
+    if (animationId !== null) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+    }
+
+
+    noteArea.innerHTML = "";
+
+
+    const result =
+        makeSong();
+
+    const song =
+        result.notes;
+
+    const totalBeats =
+        result.totalBeats;
+
+
+    if (melody.length === 0) {
+        status.textContent = "音符がありません";
+        return;
+    }
+
+
+    /*
+    BPM
+    */
+
+    let BPM =
+        Number(bpmInput.value);
+
+    if (
+        !Number.isFinite(BPM) ||
+        BPM < 30
+    ) {
+        BPM = 120;
+        bpmInput.value = 120;
+    }
+
+
+    const speed =
+        Number(speedSelect.value) || 1;
+
+    const MS_PER_BEAT =
+        60000 / (BPM * speed);
+
+    const PIXELS_PER_BEAT =
+        60;
+
+    const PLAY_LINE_Y =
+        400;
+
+    const LEAD_BEATS =
+        4;
+
+    const LEAD_TIME =
+        LEAD_BEATS *
+        MS_PER_BEAT;
+
+
+    bpmDisplay.textContent =
+        speed === 1
+            ? `BPM ${BPM}`
+            : `BPM ${BPM}・${speed}倍`;
+
+
+    if (song.length === 0) {
+        status.textContent =
+            "休符だけなので表示するノーツがありません";
+        return;
+    }
+
+
+    /*
+    ここは、音を付ける前に動いていた
+    animationの仕組みに戻しています。
+    */
+
+    const noteElements =
+        song.map(
+            noteData => {
+                const item =
+                    createNote(
+                        noteData,
+                        PIXELS_PER_BEAT
+                    );
+
+                item.played = false;
+
+                return item;
+            }
+        );
+
+
+    /*
+    スタートボタンを押した瞬間に
+    AudioContextを有効化
+    */
+
+    if (soundToggle.checked) {
+
+        if (!audioContext) {
+            audioContext =
+                new (
+                    window.AudioContext ||
+                    window.webkitAudioContext
+                )();
+        }
+
+        if (audioContext.state === "suspended") {
+            audioContext.resume();
+        }
+
+    }
+
+
+    status.textContent =
+        "4拍後にスタート 🎵";
+
+
+    const animationStart =
+        performance.now();
+
+
+    function animate(now) {
+
+        const elapsed =
+            now -
+            animationStart;
+
+
+        const songTimeMs =
+            elapsed -
+            LEAD_TIME;
+
+
+        const currentBeat =
+            songTimeMs /
+            MS_PER_BEAT;
+
+
+        noteElements.forEach(
+            item => {
+
+                const noteData =
+                    item.data;
+
+                const element =
+                    item.element;
+
+
+                const beatsUntilStart =
+                    noteData.start -
+                    currentBeat;
+
+
+                const bottomY =
+                    PLAY_LINE_Y -
+                    (
+                        beatsUntilStart *
+                        PIXELS_PER_BEAT
+                    );
+
+
+                const height =
+                    noteData.beats *
+                    PIXELS_PER_BEAT;
+
+
+                const topY =
+                    bottomY -
+                    height;
+
+
+                element.style.transform =
+                    `translateY(${topY}px)`;
+
+
+                /*
+                白線に到達した瞬間に
+                1回だけ音を鳴らす
+                */
+
+                if (
+                    soundToggle.checked &&
+                    !item.played &&
+                    currentBeat >= noteData.start
+                ) {
+
+                    item.played = true;
+
+                    playKalimbaTone(
+                        noteData.pitch
+                    );
+
+                }
+
+            }
+        );
+
+
+        if (
+            currentBeat >= 0 &&
+            currentBeat <
+                totalBeats
+        ) {
+
+            status.textContent =
+                "演奏中 🎵";
+
+        }
+
+
+        if (
+            currentBeat >
+                totalBeats + 1
+        ) {
+
+            status.textContent =
+                "演奏終了！ 🎉";
+
+            animationId =
+                null;
+
+            return;
+
+        }
+
+
+        animationId =
+            requestAnimationFrame(
+                animate
+            );
+
+    }
+
+
+    animationId =
+        requestAnimationFrame(
+            animate
+        );
+
+}
+
+/* ========================================
+   ノーツを作る
+======================================== */
+
+function createNote(
+    noteData,
+    pixelsPerBeat
+) {
+
+    const element =
+        document.createElement(
+            "div"
+        );
+
+
+    element.className =
+        "note";
+
+    /*
+    鍵盤位置で色分け：
+    1〜8番＝左手、9番(C4)＝中央、10〜17番＝右手
+    */
+    if (noteData.key < 9) {
+
+        element.classList.add(
+            "hand-left"
+        );
+
+    } else if (noteData.key === 9) {
+
+        element.classList.add(
+            "hand-center"
+        );
+
+    } else {
+
+        element.classList.add(
+            "hand-right"
+        );
+
+    }
+
+
+    element.textContent =
+        noteData.number;
+
+
+    /*
+    鍵盤とまったく同じ
+    横位置を使用
+    */
+
+    const laneStep =
+        95 / 16;
+
+
+    const left =
+        (
+            noteData.key - 1
+        ) *
+        laneStep;
+
+
+    element.style.left =
+        left + "%";
+
+
+    /*
+    拍数＝ノーツの長さ
+    */
+
+    const height =
+        Math.max(
+            15,
+            noteData.beats *
+            pixelsPerBeat
+        );
+
+
+    element.style.height =
+        height + "px";
+
+
+    element.style.top =
+        "0px";
+
+
+    noteArea.appendChild(
+        element
+    );
+
+
+    return {
+
+        data:
+            noteData,
+
+        element:
+            element
+
+    };
+
+}
+
+
+/* ========================================
+   曲の共有・書き出し・読み込み
+======================================== */
+
+function currentSongData() {
+
+    return {
+        version: 1,
+        title: songTitle.value.trim() || "無題の曲",
+        bpm: Number(bpmInput.value) || 120,
+        melody: JSON.parse(JSON.stringify(melody))
+    };
+
+}
+
+
+function applySongData(data) {
+
+    if (
+        !data ||
+        !Array.isArray(data.melody)
+    ) {
+        throw new Error("曲データの形式が正しくありません");
+    }
+
+    if (animationId !== null) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+    }
+
+    melody =
+        JSON.parse(
+            JSON.stringify(data.melody)
+        );
+
+    songTitle.value =
+        String(data.title || "読み込んだ曲");
+
+    const importedBpm =
+        Number(data.bpm);
+
+    bpmInput.value =
+        Number.isFinite(importedBpm) &&
+        importedBpm >= 30 &&
+        importedBpm <= 300
+            ? importedBpm
+            : 120;
+
+    bpmDisplay.textContent =
+        `BPM ${bpmInput.value}`;
+
+    noteArea.innerHTML = "";
+
+    finishEditing();
+    renderNoteList();
+
+}
+
+
+function encodeSongForUrl(data) {
+
+    const json =
+        JSON.stringify(data);
+
+    const bytes =
+        new TextEncoder().encode(json);
+
+    let binary = "";
+
+    bytes.forEach(
+        byte => {
+            binary +=
+                String.fromCharCode(byte);
+        }
+    );
+
+    return btoa(binary)
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_")
+        .replace(/=+$/g, "");
+
+}
+
+
+function decodeSongFromUrl(encoded) {
+
+    const normalized =
+        encoded
+            .replace(/-/g, "+")
+            .replace(/_/g, "/");
+
+    const padded =
+        normalized +
+        "=".repeat(
+            (4 - normalized.length % 4) % 4
+        );
+
+    const binary =
+        atob(padded);
+
+    const bytes =
+        Uint8Array.from(
+            binary,
+            char => char.charCodeAt(0)
+        );
+
+    return JSON.parse(
+        new TextDecoder().decode(bytes)
+    );
+
+}
+
+
+shareSongButton.addEventListener(
+    "click",
+    async function() {
+
+        const data =
+            currentSongData();
+
+        const encoded =
+            encodeSongForUrl(data);
+
+        const base =
+            location.href.split("#")[0];
+
+        const shareUrl =
+            `${base}#song=${encoded}`;
+
+        if (location.protocol === "file:") {
+
+            status.textContent =
+                "共有リンク機能は、アプリをURL公開したあとに使えます。今は「曲ファイル」で共有できます。";
+
+            return;
+
+        }
+
+        try {
+
+            await navigator.clipboard.writeText(
+                shareUrl
+            );
+
+            status.textContent =
+                "共有リンクをコピーしました 🔗";
+
+        } catch (error) {
+
+            window.prompt(
+                "このURLをコピーして友達に送ってください",
+                shareUrl
+            );
+
+        }
+
+    }
+);
+
+
+exportSongButton.addEventListener(
+    "click",
+    function() {
+
+        const data =
+            currentSongData();
+
+        const blob =
+            new Blob(
+                [
+                    JSON.stringify(
+                        data,
+                        null,
+                        2
+                    )
+                ],
+                {
+                    type:
+                        "application/json"
+                }
+            );
+
+        const url =
+            URL.createObjectURL(blob);
+
+        const link =
+            document.createElement("a");
+
+        const safeTitle =
+            data.title
+                .replace(
+                    /[\\/:*?"<>|]/g,
+                    "_"
+                )
+                .slice(0, 50);
+
+        link.href = url;
+
+        link.download =
+            `${safeTitle || "kalimba-song"}.json`;
+
+        document.body.appendChild(link);
+
+        link.click();
+
+        link.remove();
+
+        URL.revokeObjectURL(url);
+
+        status.textContent =
+            "曲ファイルを書き出しました";
+
+    }
+);
+
+
+importSongButton.addEventListener(
+    "click",
+    function() {
+
+        importSongFile.click();
+
+    }
+);
+
+
+importSongFile.addEventListener(
+    "change",
+    async function() {
+
+        const file =
+            importSongFile.files[0];
+
+        if (!file) {
+            return;
+        }
+
+        try {
+
+            const text =
+                await file.text();
+
+            const data =
+                JSON.parse(text);
+
+            applySongData(data);
+
+            status.textContent =
+                `「${songTitle.value}」を読み込みました`;
+
+        } catch (error) {
+
+            status.textContent =
+                "この曲ファイルは読み込めませんでした";
+
+        } finally {
+
+            importSongFile.value = "";
+
+        }
+
+    }
+);
+
+
+function loadSharedSongFromUrl() {
+
+    if (
+        !location.hash.startsWith(
+            "#song="
+        )
+    ) {
+        return;
+    }
+
+    try {
+
+        const encoded =
+            location.hash.slice(6);
+
+        const data =
+            decodeSongFromUrl(encoded);
+
+        applySongData(data);
+
+        status.textContent =
+            `共有された「${songTitle.value}」を開きました`;
+
+    } catch (error) {
+
+        status.textContent =
+            "共有された曲を読み込めませんでした";
+
+    }
+
+}
+
+
+/* ========================================
+   曲の保存・読み込み
+======================================== */
+
+const STORAGE_KEY =
+    "kalimbaPlayerSongsV1";
+
+
+function getSavedSongs() {
+
+    try {
+
+        const raw =
+            localStorage.getItem(
+                STORAGE_KEY
+            );
+
+        if (!raw) {
+            return {};
+        }
+
+        const parsed =
+            JSON.parse(raw);
+
+        return (
+            parsed &&
+            typeof parsed === "object"
+        )
+            ? parsed
+            : {};
+
+    } catch (error) {
+
+        return {};
+
+    }
+
+}
+
+
+function writeSavedSongs(songs) {
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(songs)
+    );
+
+}
+
+
+function refreshSavedSongSelect(
+    selectedTitle = ""
+) {
+
+    const songs =
+        getSavedSongs();
+
+    savedSongSelect.innerHTML =
+        '<option value="">曲を選んでください</option>';
+
+
+    Object.keys(songs)
+        .sort(
+            (a, b) =>
+                a.localeCompare(
+                    b,
+                    "ja"
+                )
+        )
+        .forEach(
+            title => {
+
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+                option.value =
+                    title;
+
+                option.textContent =
+                    title;
+
+                savedSongSelect.appendChild(
+                    option
+                );
+
+            }
+        );
+
+
+    if (
+        selectedTitle &&
+        songs[selectedTitle]
+    ) {
+
+        savedSongSelect.value =
+            selectedTitle;
+
+    }
+
+}
+
+
+saveSongButton.addEventListener(
+    "click",
+    function() {
+
+        const title =
+            songTitle.value.trim();
+
+        if (!title) {
+
+            status.textContent =
+                "曲名を入力してください";
+
+            songTitle.focus();
+
+            return;
+        }
+
+
+        const songs =
+            getSavedSongs();
+
+
+        if (songs[title]) {
+
+            const overwrite =
+                confirm(
+                    `「${title}」はすでに保存されています。上書きしますか？`
+                );
+
+            if (!overwrite) {
+                return;
+            }
+
+        }
+
+
+        songs[title] = {
+
+            title:
+                title,
+
+            bpm:
+                Number(bpmInput.value) || 120,
+
+            melody:
+                JSON.parse(
+                    JSON.stringify(
+                        melody
+                    )
+                )
+
+        };
+
+
+        try {
+
+            writeSavedSongs(
+                songs
+            );
+
+            refreshSavedSongSelect(
+                title
+            );
+
+            status.textContent =
+                `「${title}」を保存しました 💾`;
+
+        } catch (error) {
+
+            status.textContent =
+                "保存できませんでした";
+
+        }
+
+    }
+);
+
+
+loadSongButton.addEventListener(
+    "click",
+    function() {
+
+        const title =
+            savedSongSelect.value;
+
+        if (!title) {
+
+            status.textContent =
+                "読み込む曲を選んでください";
+
+            return;
+        }
+
+
+        const songs =
+            getSavedSongs();
+
+        const saved =
+            songs[title];
+
+
+        if (!saved) {
+
+            status.textContent =
+                "保存した曲が見つかりません";
+
+            refreshSavedSongSelect();
+
+            return;
+        }
+
+
+        if (animationId !== null) {
+
+            cancelAnimationFrame(
+                animationId
+            );
+
+            animationId =
+                null;
+
+        }
+
+
+        melody =
+            JSON.parse(
+                JSON.stringify(
+                    saved.melody || []
+                )
+            );
+
+
+        songTitle.value =
+            saved.title || title;
+
+
+        bpmInput.value =
+            saved.bpm || 120;
+
+
+        bpmDisplay.textContent =
+            `BPM ${bpmInput.value}`;
+
+
+        noteArea.innerHTML =
+            "";
+
+
+        finishEditing();
+
+        renderNoteList();
+
+        refreshSavedSongSelect(
+            title
+        );
+
+
+        status.textContent =
+            `「${title}」を読み込みました`;
+
+    }
+);
+
+
+deleteSavedSongButton.addEventListener(
+    "click",
+    function() {
+
+        const title =
+            savedSongSelect.value;
+
+        if (!title) {
+
+            status.textContent =
+                "削除する保存曲を選んでください";
+
+            return;
+        }
+
+
+        const ok =
+            confirm(
+                `保存した「${title}」を削除しますか？`
+            );
+
+
+        if (!ok) {
+            return;
+        }
+
+
+        const songs =
+            getSavedSongs();
+
+        delete songs[title];
+
+
+        try {
+
+            writeSavedSongs(
+                songs
+            );
+
+            refreshSavedSongSelect();
+
+            status.textContent =
+                `保存した「${title}」を削除しました`;
+
+        } catch (error) {
+
+            status.textContent =
+                "保存曲を削除できませんでした";
+
+        }
+
+    }
+);
+
+
+/* ========================================
+   BPM表示
+======================================== */
+
+bpmInput.addEventListener(
+    "input",
+    function() {
+
+        bpmDisplay.textContent =
+            `BPM ${bpmInput.value}`;
+
+    }
+);
+
+
+speedSelect.addEventListener(
+    "change",
+    function() {
+
+        const speed =
+            Number(speedSelect.value) || 1;
+
+        bpmDisplay.textContent =
+            speed === 1
+                ? `BPM ${bpmInput.value}`
+                : `BPM ${bpmInput.value}・${speed}倍`;
+
+    }
+);
+
+
+soundToggle.addEventListener(
+    "change",
+    function() {
+
+        this.parentElement.lastChild.textContent =
+            this.checked
+                ? " 🔊 音あり"
+                : " 🔇 音なし";
+
+    }
+);
+
+
+/* ========================================
+   初期表示
+======================================== */
+
+updateChordUI();
+renderNoteList();
+refreshSavedSongSelect();
+loadSharedSongFromUrl();
+
+
+/* スマホでは「曲をつくる」を最初から折りたたむ */
+const songEditorPanel = document.getElementById("songEditor");
+const songEditorToggle = document.getElementById("editorToggle");
+const songEditorToggleIcon = document.getElementById("editorToggleIcon");
+const songEditorMedia = window.matchMedia("(max-width: 600px)");
+
+function setSongEditorCollapsed(collapsed) {
+    songEditorPanel.classList.toggle("mobile-collapsed", collapsed);
+    songEditorToggle.setAttribute("aria-expanded", String(!collapsed));
+    songEditorToggleIcon.textContent = collapsed ? "▼" : "▲";
+}
+
+function syncSongEditorToScreen() {
+    setSongEditorCollapsed(songEditorMedia.matches);
+}
+
+songEditorToggle.addEventListener("click", function () {
+    if (!songEditorMedia.matches) return;
+    setSongEditorCollapsed(
+        !songEditorPanel.classList.contains("mobile-collapsed")
+    );
+});
+
+if (typeof songEditorMedia.addEventListener === "function") {
+    songEditorMedia.addEventListener("change", syncSongEditorToScreen);
+} else {
+    songEditorMedia.addListener(syncSongEditorToScreen);
+}
+
+syncSongEditorToScreen();
+
+</script>
+
+
+</body>
+
+</html>
