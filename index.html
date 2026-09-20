@@ -1029,6 +1029,119 @@ button {
     }
 }
 
+
+/* ===== スマホ横向き：演奏スタートを小さく固定／準備表示は隠す ===== */
+@media (max-width: 900px) and (orientation: landscape) {
+    /* controls自体では場所を取らない */
+    .controls {
+        position: static;
+        height: 0;
+        min-height: 0;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* 演奏中の画面を邪魔しないよう、スタートだけ左上に固定 */
+    #startButton {
+        position: fixed;
+        top: 8px;
+        left: 8px;
+        z-index: 9000;
+        width: auto;
+        min-width: 0;
+        min-height: 36px;
+        height: 36px;
+        padding: 0 12px;
+        margin: 0;
+        border-radius: 18px;
+        font-size: 12px;
+        line-height: 36px;
+        white-space: nowrap;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.16);
+    }
+
+    /* BPM・練習速度・音あり/なしも、左上に小さくまとめて表示 */
+    .controls {
+        position: fixed;
+        top: 8px;
+        left: 8px;
+        z-index: 9000;
+        width: auto;
+        height: 36px;
+        min-height: 36px;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        white-space: nowrap;
+    }
+
+    #startButton {
+        position: static;
+        width: auto;
+        min-width: 0;
+        min-height: 36px;
+        height: 36px;
+        padding: 0 10px;
+        margin: 0;
+        border-radius: 18px;
+        font-size: 11px;
+        line-height: 36px;
+        white-space: nowrap;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.16);
+    }
+
+    #bpmDisplay {
+        display: inline-flex;
+        align-items: center;
+        height: 30px;
+        padding: 0 8px;
+        border-radius: 15px;
+        background: rgba(255,255,255,0.92);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        font-size: 10px;
+        line-height: 30px;
+        color: #5f3d2b;
+    }
+
+    .controls > label {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        height: 30px;
+        padding: 0 7px;
+        margin: 0;
+        border-radius: 15px;
+        background: rgba(255,255,255,0.92);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        font-size: 10px;
+        line-height: 30px;
+        color: #5f3d2b;
+    }
+
+    .controls select {
+        min-height: 24px;
+        height: 24px;
+        width: auto;
+        padding: 0 3px;
+        margin: 0;
+        font-size: 10px;
+    }
+
+    .controls input[type="checkbox"] {
+        width: 14px;
+        height: 14px;
+        min-height: 0;
+        margin: 0;
+    }
+
+    /* 下の「準備OK」などのステータス表示は非表示 */
+    .status {
+        display: none;
+    }
+}
+
 </style>
 
 </head>
@@ -2761,8 +2874,18 @@ function startSong() {
     const PIXELS_PER_BEAT =
         60;
 
+    /*
+    実際に画面に表示されている白線の位置を使う。
+    スマホ横向きで白線位置が変わっても、
+    ノーツ到達と発音タイミングが一致するようにする。
+    */
+    const playLineElement =
+        document.querySelector(".play-line");
+
     const PLAY_LINE_Y =
-        400;
+        playLineElement
+            ? playLineElement.offsetTop
+            : 400;
 
     const LEAD_BEATS =
         4;
