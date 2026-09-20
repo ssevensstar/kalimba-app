@@ -887,6 +887,148 @@ button {
   .note { font-size: 10px; }
 }
 
+
+/* ===== スマホ横向き：演奏画面を1画面に収める調整 ===== */
+@media (max-width: 900px) and (orientation: landscape) {
+    body {
+        padding: 3px;
+        overflow-x: hidden;
+    }
+
+    /* 作曲欄は横向きではコンパクトに */
+    .editor {
+        width: min(98vw, 1000px);
+        padding: 4px 10px;
+        margin: 0 auto 3px;
+    }
+
+    /* 茶色い演奏エリアを画面内に収める */
+    .game {
+        width: 98vw;
+        height: 88vh;
+        min-height: 300px;
+        max-height: none;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* ノーツが見える領域を大きく */
+    .note-area {
+        left: 2%;
+        right: 2%;
+        top: 0;
+        height: 76%;
+    }
+
+    .play-line {
+        left: 2%;
+        right: 2%;
+        top: 76%;
+        height: 4px;
+    }
+
+    /* 鍵盤を短くして、全体を画面内に表示 */
+    .keyboard {
+        left: 2%;
+        right: 2%;
+        bottom: 5px;
+        height: 20%;
+        align-items: flex-start;
+    }
+
+    /* 既存の段差比率を保ちながら全鍵を短くする */
+    .keyboard .key {
+        max-height: 100%;
+        min-height: 0;
+        padding-bottom: 4px;
+    }
+
+    .keyboard .pos1, .keyboard .pos17 { height: 73%; }
+    .keyboard .pos2, .keyboard .pos16 { height: 77%; }
+    .keyboard .pos3, .keyboard .pos15 { height: 80%; }
+    .keyboard .pos4, .keyboard .pos14 { height: 83%; }
+    .keyboard .pos5, .keyboard .pos13 { height: 87%; }
+    .keyboard .pos6, .keyboard .pos12 { height: 90%; }
+    .keyboard .pos7, .keyboard .pos11 { height: 93%; }
+    .keyboard .pos8, .keyboard .pos10 { height: 97%; }
+    .keyboard .pos9 { height: 100%; }
+
+    .key-letter {
+        font-size: 9px;
+    }
+
+    .key-number {
+        font-size: 8px;
+    }
+
+    .note {
+        font-size: 10px;
+    }
+}
+
+
+/* ===== スマホ：曲をつくるを小さいフローティングボタンに ===== */
+@media (max-width: 900px) {
+    .editor {
+        background: transparent;
+        box-shadow: none;
+        border: 0;
+        padding: 0;
+        margin: 0;
+        width: auto;
+    }
+
+    #editorToggle {
+        position: fixed;
+        top: 8px;
+        right: 8px;
+        z-index: 9000;
+        width: auto;
+        min-width: 0;
+        min-height: 36px;
+        height: 36px;
+        padding: 0 11px;
+        margin: 0;
+        border: 0;
+        border-radius: 18px;
+        background: rgba(255,255,255,0.92);
+        color: #5f3d2b;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.16);
+        font-size: 12px;
+        line-height: 36px;
+        white-space: nowrap;
+    }
+
+    /* 閉じている時は作曲欄が場所を取らない */
+    .editor.mobile-collapsed .editor-content {
+        display: none;
+    }
+
+    /* 開いた時だけ、作曲パネルを画面上に重ねて表示 */
+    .editor:not(.mobile-collapsed) .editor-content {
+        position: fixed;
+        top: 50px;
+        right: 8px;
+        z-index: 8999;
+        width: min(360px, calc(100vw - 16px));
+        max-height: calc(100vh - 60px);
+        overflow-y: auto;
+        box-sizing: border-box;
+        padding: 14px;
+        border-radius: 14px;
+        background: rgba(255,255,255,0.97);
+        box-shadow: 0 6px 22px rgba(0,0,0,0.22);
+    }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+    /* 上部バーのための高さを使わず、演奏画面を最大限確保 */
+    .game {
+        margin-top: 3px;
+        height: 96vh;
+    }
+}
+
 </style>
 
 </head>
