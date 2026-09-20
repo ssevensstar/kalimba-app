@@ -855,12 +855,53 @@ button {
     }
 }
 
+
+/* スマホ：縦向き案内／横向き演奏モード */
+.rotate-notice { display: none; }
+
+@media (max-width: 900px) and (orientation: portrait) {
+  .rotate-notice {
+    position: fixed; inset: 0; z-index: 99999;
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px; box-sizing: border-box;
+    background: #f5f1e8; text-align: center;
+  }
+  .rotate-notice-card { max-width: 340px; color: #5f3d2b; }
+  .rotate-icon { font-size: 54px; line-height: 1; margin-bottom: 18px; }
+  .rotate-title { font-size: 20px; font-weight: 700; margin-bottom: 10px; }
+  .rotate-text { font-size: 14px; line-height: 1.7; opacity: .8; }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  body { padding: 6px; }
+  .editor { width: min(96vw, 900px); padding: 8px 12px; margin-bottom: 6px; }
+  .game {
+    width: min(98vw, 900px);
+    height: 78vh; min-height: 330px; max-height: 560px;
+  }
+  .note-area { left: 2%; right: 2%; height: 61%; }
+  .play-line { left: 2%; right: 2%; top: 61%; }
+  .keyboard { left: 2%; right: 2%; bottom: 8px; height: 31%; }
+  .key-letter { font-size: 10px; }
+  .key-number { font-size: 9px; }
+  .note { font-size: 10px; }
+}
+
 </style>
 
 </head>
 
 
 <body>
+
+<div id="rotateNotice" class="rotate-notice" aria-hidden="true">
+  <div class="rotate-notice-card">
+    <div class="rotate-icon">↻</div>
+    <div class="rotate-title">スマホを横向きにしてください</div>
+    <div class="rotate-text">横向きにすると、17鍵を広く使って演奏できます。</div>
+  </div>
+</div>
+
 
 
 <h1>🎵 Kalimba Player</h1>
@@ -3557,7 +3598,7 @@ loadSharedSongFromUrl();
 const songEditorPanel = document.getElementById("songEditor");
 const songEditorToggle = document.getElementById("editorToggle");
 const songEditorToggleIcon = document.getElementById("editorToggleIcon");
-const songEditorMedia = window.matchMedia("(max-width: 600px)");
+const songEditorMedia = window.matchMedia("(max-width: 900px)");
 
 function setSongEditorCollapsed(collapsed) {
     songEditorPanel.classList.toggle("mobile-collapsed", collapsed);
