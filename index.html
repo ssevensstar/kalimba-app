@@ -358,6 +358,25 @@ button {
 }
 
 
+/* 音符の文字部分を指・マウスでドラッグして並べ替える */
+.note-chip .note-drag-area {
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+    padding: 3px 2px;
+}
+
+.note-chip.is-dragging {
+    opacity: 0.55;
+    outline: 2px dashed #8b5738;
+}
+
+.note-chip.drag-target {
+    box-shadow: 0 0 0 3px rgba(139, 87, 56, 0.22);
+}
+
+
 .note-chip button {
 
     min-width: 27px;
@@ -1982,6 +2001,10 @@ function renderNoteList() {
                 "note-chip";
 
 
+            chip.dataset.index =
+                String(index);
+
+
             if (
                 index ===
                 editingIndex
@@ -2013,6 +2036,15 @@ function renderNoteList() {
 
             text.textContent =
                 `${index + 1}. ${formatPitch(pitch)} / ${formatBeats(beats)}`;
+
+            text.className =
+                "note-drag-area";
+
+            enableSwipeReorder(
+                text,
+                chip,
+                index
+            );
 
 
             /*
@@ -2184,6 +2216,265 @@ function renderNoteList() {
         }
     );
 
+}
+
+
+/* ========================================
+   スワイプ / ドラッグで並べ替え
+======================================== */
+
+function enableSwipeReorder(
+    dragArea,
+    chip,
+    fromIndex
+) {
+
+    let pointerId = null;
+    let targetIndex = fromIndex;
+    let moved = false;
+
+    dragArea.addEventListener(
+        "pointerdown",
+        function(event) {
+
+            if (
+                event.pointerType === "mouse" &&
+                event.button !== 0
+            ) {
+                return;
+            }
+
+            pointerId = event.pointerId;
+            targetIndex = fromIndex;
+            moved = false;
+
+            dragArea.setPointerCapture(
+                pointerId
+            );
+
+            chip.classList.add(
+                "is-dragging"
+            );
+
+            event.preventDefault();
+        }
+    );
+
+    dragArea.addEventListener(
+        "pointermove",
+        function(event) {
+
+            if (
+                pointerId !==
+                event.pointerId
+            ) {
+                return;
+            }
+
+            moved = true;
+
+            const element =
+                document.elementFromPoint(
+                    event.clientX,
+                    event.clientY
+                );
+
+            const targetChip =
+                element
+                    ? element.closest(
+                        ".note-chip"
+                    )
+                    : null;
+
+            document
+                .querySelectorAll(
+                    ".note-chip.drag-target"
+                )
+                .forEach(
+                    item =>
+                        item.classList.remove(
+                            "drag-target"
+                        )
+                );
+
+            if (
+                targetChip &&
+                noteList.contains(
+                    targetChip
+                )
+            ) {
+
+                const foundIndex =
+                    Number(
+                        targetChip.dataset.index
+                    );
+
+                if (
+                    Number.isInteger(
+                        foundIndex
+                    )
+                ) {
+
+                    targetIndex =
+                        foundIndex;
+
+                    targetChip.classList.add(
+                        "drag-target"
+                    );
+                }
+            }
+
+            /*
+            画面の上下端に近づいたら
+            少しずつスクロール
+            */
+            const edge = 70;
+
+            if (
+                event.clientY < edge
+            ) {
+                window.scrollBy(
+                    0,
+                    -12
+                );
+            }
+            else if (
+                event.clientY >
+                window.innerHeight - edge
+            ) {
+                window.scrollBy(
+                    0,
+                    12
+                );
+            }
+
+            event.preventDefault();
+        }
+    );
+
+    function finishDrag(event) {
+
+        if (
+            pointerId === null ||
+            (
+                event &&
+                event.pointerId !==
+                pointerId
+            )
+        ) {
+            return;
+        }
+
+        chip.classList.remove(
+            "is-dragging"
+        );
+
+        document
+            .querySelectorAll(
+                ".note-chip.drag-target"
+            )
+            .forEach(
+                item =>
+                    item.classList.remove(
+                        "drag-target"
+                    )
+            );
+
+        try {
+            dragArea.releasePointerCapture(
+                pointerId
+            );
+        }
+        catch (error) {
+            /* 何もしない */
+        }
+
+        pointerId = null;
+
+        if (
+            moved &&
+            targetIndex !==
+            fromIndex
+        ) {
+
+            moveNoteToPosition(
+                fromIndex,
+                targetIndex
+            );
+        }
+    }
+
+    dragArea.addEventListener(
+        "pointerup",
+        finishDrag
+    );
+
+    dragArea.addEventListener(
+        "pointercancel",
+        finishDrag
+    );
+}
+
+
+/* ========================================
+   好きな位置へ移動
+======================================== */
+
+function moveNoteToPosition(
+    fromIndex,
+    toIndex
+) {
+
+    if (
+        fromIndex === toIndex ||
+        fromIndex < 0 ||
+        fromIndex >= melody.length ||
+        toIndex < 0 ||
+        toIndex >= melody.length
+    ) {
+        return;
+    }
+
+    const movedNote =
+        melody.splice(
+            fromIndex,
+            1
+        )[0];
+
+    melody.splice(
+        toIndex,
+        0,
+        movedNote
+    );
+
+    if (
+        editingIndex === fromIndex
+    ) {
+        editingIndex =
+            toIndex;
+    }
+    else if (
+        editingIndex >= 0
+    ) {
+
+        if (
+            fromIndex < editingIndex &&
+            toIndex >= editingIndex
+        ) {
+            editingIndex--;
+        }
+        else if (
+            fromIndex > editingIndex &&
+            toIndex <= editingIndex
+        ) {
+            editingIndex++;
+        }
+    }
+
+    renderNoteList();
+
+    status.textContent =
+        `${fromIndex + 1}番目の音符を${toIndex + 1}番目へ移動しました`;
 }
 
 
