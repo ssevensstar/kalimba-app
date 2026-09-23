@@ -1353,6 +1353,10 @@ button {
                     1/2拍
                 </option>
 
+                <option value="0.75">
+                    3/4拍
+                </option>
+
                 <option
                     value="1"
                     selected
@@ -2208,6 +2212,10 @@ function formatBeats(beats) {
 
     if (beats === 0.5) {
         return "1/2拍";
+    }
+
+    if (beats === 0.75) {
+        return "3/4拍";
     }
 
     if (beats === 1.5) {
